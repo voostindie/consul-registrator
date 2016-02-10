@@ -1,0 +1,7 @@
+### Gradle template
+.gradle
+build/
+gradle-app.setting
+!gradle-wrapper.jar
+*.iml
+.idea/
