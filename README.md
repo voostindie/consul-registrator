@@ -41,3 +41,13 @@ The manifest file is an XML file called `consul-services.xml`. It must be in the
     </service>
 </consul-services>
 ```
+
+## Design decisions
+
+While investigating the technical approach for this agent I came to the following design decisions:
+
+* No dependencies outside the JRE.
+* All code in one package.
+* Exactly one public class: the agent itself.
+
+The reason for these decisions is that the agent code becomes part of the classpath, and I don't want to pollute it (too much). An alternative approach is to perform some classpath wizardry, but I'm not a magician. This is easier.
