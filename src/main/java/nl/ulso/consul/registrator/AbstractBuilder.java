@@ -24,33 +24,31 @@ abstract class AbstractBuilder {
             if (start == -1) {
                 result.append(value.substring(index));
                 return result.toString();
-            } else {
-                final int end = value.indexOf(VARIABLE_END, start);
-                if (end == -1) {
-                    result.append(value.substring(index));
-                    return result.toString();
-                }
-                if (start > index) {
-                    result.append(value.substring(index, start));
-                }
-                String defaultValue = null;
-                String variable = value.substring(start + 2, end);
-                final int split = variable.indexOf(DEFAULT_VALUE_START);
-                if (split != -1) {
-                    defaultValue = variable.substring(split + 1);
-                    variable = variable.substring(0, split);
-                }
-                if (environment.containsKey(variable)) {
-                    result.append(environment.get(variable));
-                } else {
-                    if (defaultValue != null) {
-                        result.append(defaultValue);
-                    } else {
-                        throw new RegistratorException("Environment variable not available: " + variable);
-                    }
-                }
-                index = end + 1;
             }
+            final int end = value.indexOf(VARIABLE_END, start);
+            if (end == -1) {
+                result.append(value.substring(index));
+                return result.toString();
+            }
+            if (start > index) {
+                result.append(value.substring(index, start));
+            }
+            String defaultValue = null;
+            String variable = value.substring(start + 2, end);
+            final int split = variable.indexOf(DEFAULT_VALUE_START);
+            if (split != -1) {
+                defaultValue = variable.substring(split + 1);
+                variable = variable.substring(0, split);
+            }
+            if (environment.containsKey(variable)) {
+                result.append(environment.get(variable));
+            } else if (defaultValue != null) {
+                result.append(defaultValue);
+            } else {
+                throw new RegistratorException("Environment variable not available: " + variable);
+            }
+            index = end + 1;
+
         }
         return result.toString();
     }
