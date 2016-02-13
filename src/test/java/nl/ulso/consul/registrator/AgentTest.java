@@ -4,6 +4,10 @@ import org.junit.Test;
 
 import java.util.Map;
 
+import static nl.ulso.consul.registrator.Logger.Level.DEBUG;
+import static nl.ulso.consul.registrator.Logger.Level.INFO;
+import static nl.ulso.consul.registrator.Logger.Level.SILENT;
+import static nl.ulso.consul.registrator.Logger.getLogLevel;
 import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
@@ -35,5 +39,23 @@ public class AgentTest {
     public void lowerCaseArguments() throws Exception {
         final Map<String, String> map = Agent.parseArguments("LOGGER=DEBUG");
         assertThat(map.get("logger"), is("debug"));
+    }
+
+    @Test
+    public void verboseLogging() throws Exception {
+        Agent.configureLogging("debug");
+        assertThat(getLogLevel(), is(DEBUG));
+    }
+
+    @Test
+    public void silentLogging() throws Exception {
+        Agent.configureLogging("silent");
+        assertThat(getLogLevel(), is(SILENT));
+    }
+
+    @Test
+    public void defaultLogging() throws Exception {
+        Agent.configureLogging("whatever...");
+        assertThat(getLogLevel(), is(INFO));
     }
 }

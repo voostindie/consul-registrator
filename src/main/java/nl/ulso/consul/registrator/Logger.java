@@ -14,6 +14,7 @@ class Logger {
 
     private static final String APPLICATION_NAME = "CONSUL-AGENT";
 
+
     enum Level {DEBUG, INFO, SILENT, ERROR}
 
     private static PrintStream out = System.out;
@@ -25,6 +26,10 @@ class Logger {
 
     static void setLogLevel(Level level) {
         Logger.level = level;
+    }
+
+    static Level getLogLevel() {
+        return level;
     }
 
     static void info(String line, Object... arguments) {
