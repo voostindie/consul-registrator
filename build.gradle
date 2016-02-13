@@ -2,6 +2,7 @@ group 'nl.ulso.consul.registrator'
 version '1.0.0-SNAPSHOT'
 
 apply plugin: 'java'
+apply plugin: 'jacoco'
 
 sourceCompatibility = 1.8
 
@@ -16,5 +17,13 @@ dependencies {
 jar {
     manifest {
         attributes('Premain-Class': 'nl.ulso.consul.registrator.Agent')
+    }
+}
+
+jacocoTestReport {
+    reports {
+        xml.enabled true
+        csv.enabled false
+        html.enabled false
     }
 }
