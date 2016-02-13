@@ -99,7 +99,7 @@ class Service {
         builder.append("");
     }
 
-    static class Builder {
+    static class Builder extends AbstractBuilder {
 
         private final Catalog.Builder catalogBuilder;
         private String name;
@@ -115,23 +115,23 @@ class Service {
         }
 
         Builder withName(String name) {
-            this.name = name;
+            this.name = substituteEnvironmentVariables(name);
             return this;
         }
 
         Builder withId(String id) {
-            this.id = id;
+            this.id = substituteEnvironmentVariables(id);
             return this;
         }
 
         Builder withAddress(String address) {
-            this.address = address;
+            this.address = substituteEnvironmentVariables(address);
             return this;
         }
 
         Builder withPort(String port) {
             try {
-                this.port = Integer.parseInt(port);
+                this.port = Integer.parseInt(substituteEnvironmentVariables(port));
             } catch (NumberFormatException e) {
                 throw new RegistratorException("Invalid port: " + port);
             }
@@ -142,18 +142,19 @@ class Service {
         }
 
         Builder withHttpCheckUrl(String url) {
-            this.url = url;
+            this.url = substituteEnvironmentVariables(url);
             return this;
         }
 
         Builder withHttpCheckInterval(String interval) {
-            requireValidDuration(interval);
-            this.interval = interval;
+            final String value = substituteEnvironmentVariables(interval);
+            requireValidDuration(value);
+            this.interval = value;
             return this;
         }
 
         Builder withTag(String tag) {
-            tags.add(tag);
+            tags.add(substituteEnvironmentVariables(tag));
             return this;
         }
 

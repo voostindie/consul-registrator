@@ -30,14 +30,15 @@ class Catalog {
         return new Builder();
     }
 
-    static class Builder {
+    static class Builder extends AbstractBuilder {
 
         private String delay = DEFAULT_DELAY;
         private final Set<Service> services = new HashSet<>();
 
         Builder withDelay(String delay) {
-            requireValidDuration(delay);
-            this.delay = delay;
+            final String value = substituteEnvironmentVariables(delay);
+            requireValidDuration(value);
+            this.delay = value;
             return this;
         }
 

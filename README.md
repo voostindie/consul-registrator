@@ -58,6 +58,24 @@ A catalog must contain at least one service, otherwise it's invalid. With this m
 </catalog>
 ```
 
+### Environment variable substitution
+
+The previous example is pretty useless in practice, since it contains references to infrastructure: addresses and ports. In practice these are assigned at application startup, through environment. This is why you can use environment variables anywhere. For example:
+
+```xml
+<catalog>
+    <service id="foo:${MESOS_TASK_ID}" name="foo" port="${PORT0}">
+        <http-check url="http://localhost:${PORT1}/health"/>
+    </service>
+</catalog>
+```
+
+If an environment variable is missing, the application won't start. In case you have a sensible default you can specify one like this:
+
+    ${<variable>:<default>}
+
+So a reference like `${PORT0:8080}` will use the value of the environment variable `PORT0`, falling back on the value `8080` if the variable is not defined.
+
 ### Logging
 
 The agent logs some messages to standard out. The logging can be configured by passing an argument to the agent at startup:

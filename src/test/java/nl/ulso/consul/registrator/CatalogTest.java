@@ -6,6 +6,8 @@ import javax.json.Json;
 import javax.json.JsonObject;
 import javax.json.JsonReader;
 import java.io.StringReader;
+import java.util.HashMap;
+import java.util.Map;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.startsWith;
@@ -119,6 +121,43 @@ public class CatalogTest {
                 .withHttpCheckUrl("bar")
                 .build()
                 .build();
+    }
+
+    @Test
+    public void completeServiceWithEnvironmentVariables() throws Exception {
+        final Map<String, String> map = new HashMap<>();
+        map.put("DELAY", "10s");
+        map.put("NAME", "foo");
+        map.put("ID", "bar");
+        map.put("ADDRESS", "127.0.0.1");
+        map.put("PORT", "8000");
+        map.put("URL", "bar");
+        map.put("INTERVAL", "1m");
+        map.put("TAG", "master");
+        AbstractBuilder.setEnvironmentForTesting(map);
+        final Catalog catalog = Catalog.newCatalog().withDelay("${DELAY}")
+                .newService()
+                .withName("${NAME}")
+                .withId("${ID}")
+                .withAddress("${ADDRESS}")
+                .withPort("${PORT}")
+                .withHttpCheckUrl("${URL}")
+                .withHttpCheckInterval("${INTERVAL}")
+                .withTag("${TAG}")
+                .build()
+                .build();
+        assertNotNull(catalog);
+        assertThat(catalog.getDelay(), is("10s"));
+        final Service service = findService(catalog, "bar");
+        final JsonObject object = toJson(service);
+        assertThat(object.getString("Name"), is("foo"));
+        assertThat(object.getString("ID"), is("bar"));
+        assertThat(object.getString("Address"), is("127.0.0.1"));
+        assertThat(object.getInt("Port"), is(8000));
+        assertThat(object.getJsonObject("Check").getString("HTTP"), is("bar"));
+        assertThat(object.getJsonObject("Check").getString("Interval"), is("1m"));
+        assertThat(object.getJsonArray("Tags").size(), is(1));
+        assertThat(object.getJsonArray("Tags").getString(0), is("master"));
     }
 
     private Service findService(Catalog catalog, String name) {
