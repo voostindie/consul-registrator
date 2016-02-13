@@ -22,25 +22,51 @@ Now you say:
 
 ## Manifest
 
-Where the Docker Registrator inspects the Docker container, this is not possible in the case of a runnable JAR. That's why this agent requires its own manifest file, to be packaged within the applicaion. If missing, the agent will not allow the application to be started.
+Where the Docker Registrator inspects the Docker container, this is not possible in the case of a runnable JAR. That's why this agent requires its own manifest file, to be packaged within the application. If missing, the agent will not allow the application to be started.
 
-The manifest file is an XML file called `consul-services.xml`. It must be in the META-INF directory of of the JAR and it must conform to the following format:
+The manifest file is an XML file called `consul-catalog.xml`. It must be in the META-INF directory of of the JAR and it must look as follows:
+
+### Minimal example
 
 ```xml
-<consul-services>
-    <!-- Minimal example -->
+<catalog>
     <service name="myFirstService" port="8080">
-        <http-check url="/health"/>
+        <http-check url="http://localhost:8080/health"/>
     </service>
+</catalog>
+```
 
-    <!-- Extensive example -->
-    <service id="service2" name="mySecondService" port="8100">
+A catalog must contain at least one service, otherwise it's invalid. With this minimal example:
+
+* The agent will wait 3 seconds before registering services with Consul, giving the application time to start up properly.
+* The service is assigned a unique ID in Consul that looks like `<serviceName>:<UUID>`.
+* The health check will be called by the Consul agent with an interval of 5 seconds.
+
+### Extended example
+
+```xml
+<catalog delay="0s"> <!-- No dawdling! -->
+    <service id="service1" name="myFirstService" address="192.168.1.1" port="8100">
         <http-check url="http://localhost:8180/health" interval="10s"/>
         <tag name="master"/>
         <tag name="v1"/>
     </service>
-</consul-services>
+</catalog>
 ```
+
+### Logging
+
+The agent logs some messages to standard out. The logging can be configured by passing an argument to the agent at startup:
+
+    java -javaagent:consul-registrator.jar=logger=<level> -jar <my-runnable-app.jar>
+
+Possible levels are:
+
+* `debug`: generates more diagnostic information
+* `info`: the default
+* `silent`: disables logging
+
+Error messages cannot be disabled. Any error will fail application startup, so it's probably good to have all available information.
 
 ## Design decisions
 

@@ -1,0 +1,5 @@
+<catalog>
+    <service name="myservice">
+        <http-check url="http://localhost/health"/>
+    </service>
+</catalog>
