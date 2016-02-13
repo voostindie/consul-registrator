@@ -1,0 +1,5 @@
+<consul-catalog>
+    <service name="myservice" port="">
+        <http-check url="http://localhost/health"/>
+    </service>
+</consul-catalog>

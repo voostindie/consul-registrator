@@ -1,9 +1,12 @@
 <catalog delay="0s">
     <service id="service1:foo" name="service1" address="127.0.0.1" port="8180">
         <http-check url="http://localhost:8180/health" interval="10s"/>
+        <tag name="master"/>
+        <tag name="v1"/>
     </service>
     <service id="service2:bar" name="service2" address="127.0.0.1" port="9000">
         <http-check url="http://localhost:9000/health" interval="1m"/>
+        <tag name="slave"/>
     </service>
     <service id="service3:baz" name="service3" address="127.0.0.1" port="9400">
         <http-check url="http://localhost:9400/health" interval="500ms"/>

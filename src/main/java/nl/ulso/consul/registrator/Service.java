@@ -40,6 +40,19 @@ class Service {
         return new Builder(catalogBuilder);
     }
 
+    @Override
+    public String toString() {
+        return "Service{" +
+                "name=" + name +
+                ", id=" + id +
+                ", address=" + address +
+                ", port=" + port +
+                ", url=" + url +
+                ", interval=" + interval +
+                ", tags=" + tags +
+                '}';
+    }
+
     String toConsulRegistrationJson() {
         // Not the most beautiful piece of code I've ever written, but it does the job:
         final StringBuilder builder = new StringBuilder();
