@@ -80,3 +80,5 @@ While investigating the technical approach for this agent I came to the followin
 * Exactly one public class: the agent itself.
 
 The reason for these decisions is that the agent code becomes part of the classpath, and I don't want to pollute it (too much). An alternative approach is to perform some classpath wizardry, but I'm not a magician. This is easier.
+
+Thanks to these decisions the JAR is around 25 kB currently. That should be acceptable!
