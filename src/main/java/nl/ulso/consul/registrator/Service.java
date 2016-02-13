@@ -59,10 +59,8 @@ class Service {
             append(builder, "Address", address);
             builder.append(",");
         }
-        if (port != null) {
-            append(builder, "Port", port);
-            builder.append(",");
-        }
+        append(builder, "Port", port);
+        builder.append(",");
         builder.append("\"Check\":{");
         append(builder, "HTTP", url);
         builder.append(",");
@@ -147,8 +145,11 @@ class Service {
             if (name == null) {
                 throw new RegistratorException("Required service name is missing");
             }
+            if (port == null) {
+                throw new RegistratorException("Required port is missing for service " + name);
+            }
             if (url == null) {
-                throw new RegistratorException("Required HTTP check URL is missing");
+                throw new RegistratorException("Required HTTP check URL is missing for service " + name);
             }
             return catalogBuilder.addService(new Service(this));
         }

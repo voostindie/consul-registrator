@@ -1,5 +1,5 @@
 <catalog>
-    <service name="myservice">
+    <service name="myservice" port="8100">
         <http-check url="http://localhost/health"/>
     </service>
 </catalog>
