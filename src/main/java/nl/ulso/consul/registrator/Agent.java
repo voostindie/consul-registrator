@@ -51,6 +51,7 @@ public class Agent {
                 break;
             default:
                 setLogLevel(INFO);
+                break;
         }
     }
 }

@@ -45,6 +45,7 @@ public class RegistratorTest {
 
         @Override
         public void deregister(String serviceId) {
+            // Nothing to do here. Unfortunately...
         }
 
         @Override

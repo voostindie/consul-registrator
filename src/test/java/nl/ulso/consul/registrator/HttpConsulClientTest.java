@@ -5,6 +5,7 @@ import org.junit.Rule;
 import org.junit.Test;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
+import static org.junit.Assert.fail;
 
 public class HttpConsulClientTest {
     @Rule
@@ -20,7 +21,11 @@ public class HttpConsulClientTest {
                 .newService().withName("foo").withPort("7000").withHttpCheckUrl("bar").build()
                 .build();
         final Service service = catalog.getServices().iterator().next();
-        client.register(service);
+        try {
+            client.register(service);
+        } catch (RegistratorException e) {
+            fail("Should run flawlessly!");
+        }
     }
 
     @Test(expected = RegistratorException.class)
@@ -37,7 +42,11 @@ public class HttpConsulClientTest {
     @Test
     public void deregisterServiceSuccess() throws Exception {
         consulAgent.stubFor(get(urlEqualTo("/v1/agent/service/deregister/foo")).willReturn(aResponse()));
-        client.deregister("foo");
+        try {
+            client.deregister("foo");
+        } catch (RegistratorException e) {
+            fail("Should run flawlessly!");
+        }
     }
 
     @Test(expected = RegistratorException.class)
