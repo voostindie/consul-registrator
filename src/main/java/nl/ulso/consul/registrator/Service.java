@@ -124,11 +124,12 @@ class Service {
             return this;
         }
 
-        void withAddress(String address) {
+        Builder withAddress(String address) {
             this.address = address;
+            return this;
         }
 
-        void withPort(String port) {
+        Builder withPort(String port) {
             try {
                 this.port = Integer.parseInt(port);
             } catch (NumberFormatException e) {
@@ -137,6 +138,7 @@ class Service {
             if (this.port < MINIMUM_PORT_NUMBER || this.port > MAXIMUM_PORT_NUMBER) {
                 throw new RegistratorException("Invalid port: " + port);
             }
+            return this;
         }
 
         Builder withHttpCheckUrl(String url) {
@@ -150,8 +152,9 @@ class Service {
             return this;
         }
 
-        void withTag(String tag) {
+        Builder withTag(String tag) {
             tags.add(tag);
+            return this;
         }
 
         Catalog.Builder build() {
