@@ -52,7 +52,8 @@ class GoDuration {
                 return 6.0E04;
             case "h":
                 return 3.6E06;
+            default:
+                return 1.0d;
         }
-        return 1.0d;
     }
 }

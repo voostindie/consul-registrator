@@ -19,7 +19,7 @@ public class LoggerTest {
     @Before
     public void setUp() throws Exception {
         output = new ByteArrayOutputStream();
-        Logger.setOut(new PrintStream(output));
+        setOut(new PrintStream(output));
     }
 
     @After

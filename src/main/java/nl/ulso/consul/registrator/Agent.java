@@ -45,10 +45,10 @@ public class Agent {
         switch (level) {
             case "debug":
                 setLogLevel(DEBUG);
-                return;
+                break;
             case "silent":
                 setLogLevel(SILENT);
-                return;
+                break;
             default:
                 setLogLevel(INFO);
         }
