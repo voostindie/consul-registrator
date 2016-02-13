@@ -6,7 +6,7 @@
 - [x] Register services with Consul's agent on localhost:8500
 - [x] Configurable delay on startup, to give the application the time to come up
 - [x] Configurable logging: debug, info, silent.
-- [ ] Add testcases; my enthusiasm got the better of me (again...)
+- [x] Add testcases; my enthusiasm got the better of me (again...)
 - [ ] Environment variable substitution in `consul-catalog.xml` (`${<environment_variable>[:default]}`)
 - [ ] Store service metadata from `consul-catalog.xml` in the Consul K/V store
 
