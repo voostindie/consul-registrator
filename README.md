@@ -60,7 +60,7 @@ A catalog must contain at least one service, otherwise it's invalid. With this m
 
 ### Environment variable substitution
 
-The previous example is pretty useless in practice, since it contains references to infrastructure: addresses and ports. In practice these are assigned at application startup, through environment. This is why you can use environment variables anywhere. For example:
+The previous example is pretty useless in practice, since it contains references to infrastructure: addresses and ports. In practice these are assigned at application startup, through the environment. This is why you can use environment variables anywhere. For example:
 
 ```xml
 <catalog>
