@@ -25,6 +25,9 @@ class XmlClasspathCatalogLoader implements CatalogLoader {
     private static final String HTTP_CHECK_INTERVAL = "interval";
     private static final String TAG_ELEMENT = "tag";
     private static final String TAG_NAME = "name";
+    private static final String KEY_ELEMENT = "key";
+    private static final String KEY_NAME = "name";
+    private static final String KEY_VALUE = "value";
 
     private final String classpathResource;
 
@@ -71,12 +74,17 @@ class XmlClasspathCatalogLoader implements CatalogLoader {
         if (catalog.hasAttribute(CATALOG_DELAY)) {
             builder.withDelay(catalog.getAttribute(CATALOG_DELAY));
         }
+        extractServices(catalog, builder);
+        extractKeyValuePairs(catalog, builder);
+        return builder.build();
+    }
+
+    private void extractServices(Element catalog, Catalog.Builder builder) {
         final NodeList services = catalog.getElementsByTagName(SERVICE_ELEMENT);
         final int length = services.getLength();
         for (int i = 0; i < length; i++) {
             extractService((Element) services.item(i), builder.newService());
         }
-        return builder.build();
     }
 
     private void extractService(Element service, Service.Builder builder) {
@@ -97,8 +105,8 @@ class XmlClasspathCatalogLoader implements CatalogLoader {
         builder.build();
     }
 
-    private void extractHealthCheck(Element element, Service.Builder builder) {
-        final NodeList checks = element.getElementsByTagName(HTTP_CHECK_ELEMENT);
+    private void extractHealthCheck(Element service, Service.Builder builder) {
+        final NodeList checks = service.getElementsByTagName(HTTP_CHECK_ELEMENT);
         if (checks.getLength() == 0) {
             return;
         }
@@ -111,14 +119,31 @@ class XmlClasspathCatalogLoader implements CatalogLoader {
         }
     }
 
-    private void extractTags(Element serviceElement, Service.Builder serviceBuilder) {
-        final NodeList tags = serviceElement.getElementsByTagName(TAG_ELEMENT);
+    private void extractTags(Element service, Service.Builder builder) {
+        final NodeList tags = service.getElementsByTagName(TAG_ELEMENT);
         final int length = tags.getLength();
         for (int i = 0; i < length; i++) {
             final Element tag = (Element) tags.item(i);
             if (tag.hasAttribute(TAG_NAME)) {
-                serviceBuilder.withTag(tag.getAttribute(TAG_NAME));
+                builder.withTag(tag.getAttribute(TAG_NAME));
             }
+        }
+    }
+
+    private void extractKeyValuePairs(Element catalog, Catalog.Builder builder) {
+        final NodeList keyValuePairs = catalog.getElementsByTagName(KEY_ELEMENT);
+        final int length = keyValuePairs.getLength();
+        for (int i = 0; i < length; i++) {
+            extractKeyValuePair((Element) keyValuePairs.item(i), builder);
+        }
+    }
+
+    private void extractKeyValuePair(Element keyValuePair, Catalog.Builder builder) {
+        if (keyValuePair.hasAttribute(KEY_NAME) && keyValuePair.hasAttribute(KEY_VALUE)) {
+            builder.withKeyValuePair(
+                    keyValuePair.getAttribute(KEY_NAME),
+                    keyValuePair.getAttribute(KEY_VALUE)
+            );
         }
     }
 }

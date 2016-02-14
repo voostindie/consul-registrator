@@ -27,16 +27,27 @@ class Registrator {
         new Timer(false).schedule(new TimerTask() {
             @Override
             public void run() {
-                runAndExitOnException(this::registerServices);
+                runAndExitOnException(this::registerWithConsul);
                 // The shutdown hook should only be installed if service registration completed.
                 // Which is why we do it here:
                 addShutdownHook(catalog);
             }
 
+            private void registerWithConsul() {
+                registerServices();
+                registerKeyValuePairs();
+            }
+
             private void registerServices() {
                 catalog.getServices().stream()
-                        .peek(s -> info("Registering service %s with Consul", s.getId()))
+                        .peek(s -> info("Registering service '%s' with Consul", s.getId()))
                         .forEach(consulClient::register);
+            }
+
+            private void registerKeyValuePairs() {
+                catalog.getKeyValuePairs().entrySet().stream()
+                        .peek(e -> info("Storing key '%s' with value '%s' in Consul", e.getKey(), e.getValue()))
+                        .forEach(e -> consulClient.storeKeyValue(e.getKey(), e.getValue()));
             }
 
         }, toMilliseconds(catalog.getDelay()));
@@ -47,9 +58,8 @@ class Registrator {
             runnable.run();
         } catch (RegistratorException e) {
             final String message = e.getMessage();
-            Logger.error("Services could not be (de)registered with Consul");
             Logger.error("%s", message);
-            Logger.error("Exiting application");
+            Logger.error("Exiting application.");
             System.err.println("Exiting application due to error: " + message);
             System.exit(-1);
         }
@@ -57,33 +67,51 @@ class Registrator {
 
     private void addShutdownHook(Catalog catalog) {
         debug("Registering shutdown hook for service deregistration");
-        Runtime.getRuntime().addShutdownHook(new ShutdownHook(consulClient, extractServiceIds(catalog)));
+        Runtime.getRuntime().addShutdownHook(
+                new ShutdownHook(consulClient, extractServiceIds(catalog), extractKeys(catalog)));
     }
 
     private Set<String> extractServiceIds(Catalog catalog) {
         return catalog.getServices().stream().map(Service::getId).collect(Collectors.toSet());
     }
 
+    private Set<String> extractKeys(Catalog catalog) {
+        return catalog.getKeyValuePairs().keySet().stream().collect(Collectors.toSet());
+    }
+
     private static class ShutdownHook extends Thread {
         private final ConsulClient consulClient;
         private final Set<String> serviceIds;
+        private final Set<String> keys;
 
-        private ShutdownHook(ConsulClient consulClient, Set<String> serviceIds) {
-            // The only thing the agent keeps in the memory application are the Consul client
-            // and the service IDs. All other things (like the catalog) may be garbage collected.
+        private ShutdownHook(ConsulClient consulClient, Set<String> serviceIds, Set<String> keys) {
+            // The only thing the agent keeps in the memory application are the Consul client,
+            // the service IDs and the keys. All other things (the rest of the catalog) may be garbage collected.
             this.consulClient = consulClient;
             this.serviceIds = serviceIds;
+            this.keys = keys;
         }
 
         @Override
         public void run() {
-            runAndExitOnException(this::deregisterServices);
+            runAndExitOnException(this::deregisterFromConsul);
+        }
+
+        private void deregisterFromConsul() {
+            deregisterKeys();
+            deregisterServices();
         }
 
         private void deregisterServices() {
             serviceIds.stream()
-                    .peek(s -> info("Deregistering service %s from Consul", s))
+                    .peek(s -> info("Deregistering service '%s' from Consul", s))
                     .forEach(consulClient::deregister);
+        }
+
+        private void deregisterKeys() {
+            keys.stream()
+                    .peek(k -> info("Removing key '%s' from Consul", k))
+                    .forEach(consulClient::removeKey);
         }
     }
 }

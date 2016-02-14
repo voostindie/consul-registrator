@@ -1,8 +1,11 @@
 package nl.ulso.consul.registrator;
 
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
+import static java.util.Collections.unmodifiableMap;
 import static java.util.Collections.unmodifiableSet;
 import static nl.ulso.consul.registrator.GoDuration.requireValidDuration;
 
@@ -12,10 +15,12 @@ class Catalog {
 
     private final String delay;
     private final Set<Service> services;
+    private Map<String, String> keyValuePairs;
 
     private Catalog(Builder builder) {
         this.delay = builder.delay;
         this.services = unmodifiableSet(new HashSet<>(builder.services));
+        this.keyValuePairs = unmodifiableMap(new HashMap<>(builder.keyValuePairs));
     }
 
     String getDelay() {
@@ -26,6 +31,10 @@ class Catalog {
         return services;
     }
 
+    Map<String, String> getKeyValuePairs() {
+        return keyValuePairs;
+    }
+
     static Builder newCatalog() {
         return new Builder();
     }
@@ -34,6 +43,7 @@ class Catalog {
 
         private String delay = DEFAULT_DELAY;
         private final Set<Service> services = new HashSet<>();
+        private final Map<String, String> keyValuePairs = new HashMap<>();
 
         Builder withDelay(String delay) {
             final String value = substituteEnvironmentVariables(delay);
@@ -48,6 +58,15 @@ class Catalog {
 
         Builder addService(Service service) {
             services.add(service);
+            return this;
+        }
+
+        Builder withKeyValuePair(String key, String value) {
+            String processedKey = substituteEnvironmentVariables(key);
+            if (processedKey.startsWith("/")) {
+                processedKey = processedKey.substring(1);
+            }
+            keyValuePairs.put(substituteEnvironmentVariables(processedKey), substituteEnvironmentVariables(value));
             return this;
         }
 

@@ -1,0 +1,7 @@
+<catalog>
+    <service name="myservice" port="8100">
+        <http-check url="http://localhost/health"/>
+    </service>
+
+    <key name="foo" value="bar"/>
+</catalog>

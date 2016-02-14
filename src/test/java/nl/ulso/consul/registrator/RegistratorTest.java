@@ -26,7 +26,8 @@ public class RegistratorTest {
         final Registrator registrator = new Registrator(new DummyCatalogLoader(), client);
         registrator.install();
         TimeUnit.MILLISECONDS.sleep(500); // Give the separate Thread some time to work...
-        assertTrue(client.registered.contains("service"));
+        assertTrue(client.services.contains("service"));
+        assertTrue(client.keys.contains("key"));
     }
 
     private static class DummyCatalogLoader implements CatalogLoader {
@@ -35,13 +36,15 @@ public class RegistratorTest {
             return Catalog.newCatalog()
                     .withDelay("0s")
                     .newService().withName("service").withId("service").withPort("8000").withHttpCheckUrl("localhost").build()
+                    .withKeyValuePair("key", "value")
                     .build();
         }
     }
 
     private static class DummyConsulClient implements ConsulClient {
 
-        Set<String> registered = new HashSet<>();
+        Set<String> services = new HashSet<>();
+        Set<String> keys = new HashSet<>();
 
         @Override
         public void deregister(String serviceId) {
@@ -50,7 +53,17 @@ public class RegistratorTest {
 
         @Override
         public void register(Service service) {
-            registered.add(service.getId());
+            services.add(service.getId());
+        }
+
+        @Override
+        public void storeKeyValue(String key, String value) {
+            keys.add(key);
+        }
+
+        @Override
+        public void removeKey(String key) {
+            // Nothing to do here. Unfortunately...
         }
     }
 }

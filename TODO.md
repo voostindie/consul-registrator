@@ -8,7 +8,8 @@
 - [x] Configurable logging: debug, info, silent.
 - [x] Add testcases; my enthusiasm got the better of me (again...)
 - [x] Environment variable substitution in `consul-catalog.xml` (`${<environment_variable>[:default]}`)
-- [ ] Store service metadata from `consul-catalog.xml` in the Consul K/V store
+- [x] Store service metadata from `consul-catalog.xml` in the Consul K/V store
+- ...to be discussed
 
 ## To be determined
 

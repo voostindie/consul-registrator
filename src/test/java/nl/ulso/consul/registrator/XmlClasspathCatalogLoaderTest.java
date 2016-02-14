@@ -2,6 +2,8 @@ package nl.ulso.consul.registrator;
 
 import org.junit.Test;
 
+import java.util.Map;
+
 import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
@@ -24,6 +26,14 @@ public class XmlClasspathCatalogLoaderTest {
         assertThat(s, containsString("url=http://localhost/health"));
         assertThat(s, containsString("interval=5s")); // default
         assertThat(s, containsString("tags=[]"));
+    }
+
+    @Test
+    public void minimalCatalogWithKeyValues() throws Exception {
+        Catalog catalog = load("minimal-catalog-key-value-pairs.xml");
+        assertNotNull(catalog);
+        Map<String, String> pairs = catalog.getKeyValuePairs();
+        assertThat(pairs.get("foo"), is("bar"));
     }
 
     @Test

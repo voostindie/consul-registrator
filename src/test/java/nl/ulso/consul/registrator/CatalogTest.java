@@ -134,8 +134,12 @@ public class CatalogTest {
         map.put("URL", "bar");
         map.put("INTERVAL", "1m");
         map.put("TAG", "master");
+        map.put("KEY1_NAME", "key1");
+        map.put("KEY1_VALUE", "value1");
+        map.put("KEY2_NAME", "/key2");
+        map.put("KEY2_VALUE", "value2");
         AbstractBuilder.setEnvironmentForTesting(map);
-        final Catalog catalog = Catalog.newCatalog().withDelay("${DELAY}")
+        final Catalog catalog = Catalog.newCatalog()
                 .newService()
                 .withName("${NAME}")
                 .withId("${ID}")
@@ -145,9 +149,14 @@ public class CatalogTest {
                 .withHttpCheckInterval("${INTERVAL}")
                 .withTag("${TAG}")
                 .build()
+                .withDelay("${DELAY}")
+                .withKeyValuePair("${KEY1_NAME}", "${KEY1_VALUE}")
+                .withKeyValuePair("${KEY2_NAME}", "${KEY2_VALUE}")
                 .build();
         assertNotNull(catalog);
         assertThat(catalog.getDelay(), is("10s"));
+        assertThat(catalog.getKeyValuePairs().get("key1"), is("value1"));
+        assertThat(catalog.getKeyValuePairs().get("key2"), is("value2"));
         final Service service = findService(catalog, "bar");
         final JsonObject object = toJson(service);
         assertThat(object.getString("Name"), is("foo"));

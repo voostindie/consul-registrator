@@ -58,9 +58,9 @@ A catalog must contain at least one service, otherwise it's invalid. With this m
 </catalog>
 ```
 
-### Environment variable substitution
+## Environment variable substitution
 
-The previous example is pretty useless in practice, since it contains references to infrastructure: addresses and ports. In practice these are assigned at application startup, through the environment. This is why you can use environment variables anywhere. For example:
+The last example is pretty useless in practice, since it contains references to infrastructure: addresses and ports. In practice these are assigned at application startup, through the environment. This is why you can use environment variables anywhere. For example:
 
 ```xml
 <catalog>
@@ -76,7 +76,22 @@ If an environment variable is missing, the application won't start. In case you 
 
 So a reference like `${PORT0:8080}` will use the value of the environment variable `PORT0`, falling back on the value `8080` if the variable is not defined.
 
-### Logging
+## Key/Value storage
+
+Consul offers a generic K/V store. You can tap into it through the manifest, like so (extending the last example):
+
+```xml
+<catalog>
+    <service .../>
+    <key
+        name="metrics/foo:${MESOS_TASK_ID}"
+        value="http://localhost:${PORT1}/metrics"/>
+</catalog>
+```
+
+Note that every key/value pair defined in the catalog will be automatically removed from Consul on application shutdown! In other words: use this facility to store values specific to the application *instances*.
+
+## Logging
 
 The agent logs some messages to standard out. The logging can be configured by passing an argument to the agent at startup:
 

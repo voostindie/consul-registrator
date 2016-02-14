@@ -21,11 +21,8 @@ public class HttpConsulClientTest {
                 .newService().withName("foo").withPort("7000").withHttpCheckUrl("bar").build()
                 .build();
         final Service service = catalog.getServices().iterator().next();
-        try {
-            client.register(service);
-        } catch (RegistratorException e) {
-            fail("Should run flawlessly!");
-        }
+        client.register(service);
+        consulAgent.verify(1, putRequestedFor(urlEqualTo("/v1/agent/service/register")));
     }
 
     @Test(expected = RegistratorException.class)
@@ -42,11 +39,8 @@ public class HttpConsulClientTest {
     @Test
     public void deregisterServiceSuccess() throws Exception {
         consulAgent.stubFor(get(urlEqualTo("/v1/agent/service/deregister/foo")).willReturn(aResponse()));
-        try {
-            client.deregister("foo");
-        } catch (RegistratorException e) {
-            fail("Should run flawlessly!");
-        }
+        client.deregister("foo");
+        consulAgent.verify(1, getRequestedFor(urlEqualTo("/v1/agent/service/deregister/foo")));
     }
 
     @Test(expected = RegistratorException.class)
@@ -61,5 +55,21 @@ public class HttpConsulClientTest {
         consulAgent.stubFor(get(urlEqualTo("/v1/agent/service/deregister/foo"))
                 .willReturn(aResponse().withFixedDelay(1000)));
         client.deregister("foo");
+    }
+
+    @Test
+    public void storeKeyValuePair() throws Exception {
+        consulAgent.stubFor(put(urlEqualTo("/v1/kv/key"))
+                .willReturn(aResponse().withStatus(200)));
+        client.storeKeyValue("key", "value");
+        consulAgent.verify(1, putRequestedFor(urlEqualTo("/v1/kv/key")));
+    }
+
+    @Test
+    public void deleteKey() throws Exception {
+        consulAgent.stubFor(delete(urlEqualTo("/v1/kv/key"))
+                .willReturn(aResponse().withStatus(200)));
+        client.removeKey("key");
+        consulAgent.verify(1, deleteRequestedFor(urlEqualTo("/v1/kv/key")));
     }
 }
