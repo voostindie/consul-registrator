@@ -5,7 +5,6 @@ import org.junit.Rule;
 import org.junit.Test;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
-import static org.junit.Assert.fail;
 
 public class HttpConsulClientTest {
     @Rule
