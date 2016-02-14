@@ -10,6 +10,16 @@ import javax.xml.parsers.ParserConfigurationException;
 import java.io.IOException;
 import java.io.InputStream;
 
+/**
+ * Creates a {@link Catalog} by parsing an XML file on the classpath.
+ * <p>
+ * This class has very limited error checking, on purpose:
+ * </p>
+ * <ul>
+ * <li>Within the XML only the elements and attributes known by this agent are accessed. Anything else is ignored.</li>
+ * <li>Validation of attribute values is in the {@link nl.ulso.consul.registrator.Catalog.Builder} class</li>
+ * </ul>
+ */
 class XmlClasspathCatalogLoader implements CatalogLoader {
 
     private static final String DEFAULT_CATALOG_LOCATION = "META-INF/consul-catalog.xml";

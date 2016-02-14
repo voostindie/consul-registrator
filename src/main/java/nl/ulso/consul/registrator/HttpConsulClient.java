@@ -8,6 +8,15 @@ import java.net.URL;
 import static java.net.HttpURLConnection.HTTP_OK;
 import static nl.ulso.consul.registrator.Logger.debug;
 
+/**
+ * Implementation for Consul's HTTP API on top of plain Java HttpURLConnections.
+ * <p>
+ * What bothers me a bit here is that a single application will typically result in multiple calls to this client,
+ * both on application startup and shutdown. What if the second or third call or something fails? Then the application
+ * will terminate, with Consul in an inconsistent state. There's no way to recover from that currently. Since the
+ * connection to Consul is through localhost the chance of requests failing is slim. But still...
+ * </p>
+ */
 class HttpConsulClient implements ConsulClient {
 
     private static final int CONNECT_TIMEOUT_MILLISECONDS = 500;

@@ -9,6 +9,11 @@ import static nl.ulso.consul.registrator.GoDuration.toMilliseconds;
 import static nl.ulso.consul.registrator.Logger.debug;
 import static nl.ulso.consul.registrator.Logger.info;
 
+/**
+ * Core orchestration class in the agent, taking care of loading the Consul catalog from the application, registering
+ * services and keys with Consul after a configurable delay and installing a shutdown hook to remove everything that was
+ * stored in Consul on startup.
+ */
 class Registrator {
 
     private final CatalogLoader catalogLoader;
@@ -30,7 +35,8 @@ class Registrator {
                 runAndExitOnException(this::registerWithConsul);
                 // The shutdown hook should only be installed if service registration completed.
                 // Which is why we do it here:
-                addShutdownHook(catalog);
+                debug("Registering shutdown hook for service deregistration");
+                Runtime.getRuntime().addShutdownHook(new ShutdownHook(consulClient, catalog));
             }
 
             private void registerWithConsul() {
@@ -65,31 +71,25 @@ class Registrator {
         }
     }
 
-    private void addShutdownHook(Catalog catalog) {
-        debug("Registering shutdown hook for service deregistration");
-        Runtime.getRuntime().addShutdownHook(
-                new ShutdownHook(consulClient, extractServiceIds(catalog), extractKeys(catalog)));
-    }
-
-    private Set<String> extractServiceIds(Catalog catalog) {
-        return catalog.getServices().stream().map(Service::getId).collect(Collectors.toSet());
-    }
-
-    private Set<String> extractKeys(Catalog catalog) {
-        return catalog.getKeyValuePairs().keySet().stream().collect(Collectors.toSet());
-    }
-
     private static class ShutdownHook extends Thread {
         private final ConsulClient consulClient;
         private final Set<String> serviceIds;
         private final Set<String> keys;
 
-        private ShutdownHook(ConsulClient consulClient, Set<String> serviceIds, Set<String> keys) {
+        public ShutdownHook(ConsulClient consulClient, Catalog catalog) {
             // The only thing the agent keeps in the memory application are the Consul client,
             // the service IDs and the keys. All other things (the rest of the catalog) may be garbage collected.
             this.consulClient = consulClient;
-            this.serviceIds = serviceIds;
-            this.keys = keys;
+            this.serviceIds = extractServiceIds(catalog);
+            this.keys = extractKeys(catalog);
+        }
+
+        private Set<String> extractServiceIds(Catalog catalog) {
+            return catalog.getServices().stream().map(Service::getId).collect(Collectors.toSet());
+        }
+
+        private Set<String> extractKeys(Catalog catalog) {
+            return catalog.getKeyValuePairs().keySet().stream().collect(Collectors.toSet());
         }
 
         @Override
