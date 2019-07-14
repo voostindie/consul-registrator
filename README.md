@@ -1,8 +1,6 @@
 # Consul Registrator Agent
 
 [![Build Status](https://travis-ci.org/voostindie/consul-registrator.svg?branch=master)](https://travis-ci.org/voostindie/consul-registrator)
-[![Code Quality](https://api.codacy.com/project/badge/grade/960587eea7c24e77b6b297c0f2cba56a)](https://www.codacy.com/app/voostindie/consul-registrator)
-[![Code Coverage](https://api.codacy.com/project/badge/coverage/960587eea7c24e77b6b297c0f2cba56a)](https://www.codacy.com/app/voostindie/consul-registrator)
 
 A Java agent that pulls metadata out of applications (runnable JARs) and (de)registers services with Consul on application startup and shutdown.
 
