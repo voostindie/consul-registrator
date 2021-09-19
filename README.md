@@ -5,6 +5,8 @@
 
 A Java agent that pulls metadata out of applications (runnable JARs) and (de)registers services with Consul on application startup and shutdown.
 
+**Update September 2021**: as I'm not using this tool anymore, I'm archiving it. Right now it's working well with modern JDKs, so it's still usable. But I'm not planning on maintaining it any longer. Who knows though?
+
 ## Use case
 
 Docker comes with its [Registrator](http://gliderlabs.com/registrator/latest/), which is a great way to (de)register services within Docker containers with Consul (and others). But what if you don't use Docker and instead run JVM applications (*runnable JARs*)?
